@@ -1,0 +1,89 @@
+grammar hu.bzolt.webdsl.WebDsl with org.eclipse.xtext.xbase.Xbase
+
+generate webDsl "http://www.bzolt.hu/webdsl/WebDsl"
+
+DomainModel:
+	elements+=AbstractElement*;
+
+AbstractElement:
+	Entity | RequestGroup | Form | ExcepGroup;
+
+RequestGroup:
+	"requests" name=ValidID "{" requests+=Request ("," requests+=Request)* "}";
+
+ExcepGroup:
+	"exceptions" name=ValidID "{" exceps+=Excep ("," exceps+=Excep)* "}";
+
+Entity:
+	"entity" name=ValidID "{" attributes+=Attribute ("," attributes+=Attribute)* "}";
+
+Attribute:
+	(required?="req")? name=ValidID ":" (list?="list" "of")? type=Type;
+
+Type:
+	Text | Num | Bool | Date | EntityRef;
+
+EntityRef:
+	entity=[Entity] (flat?="flat")?;
+
+Text:
+	name="text" ("with" "length" minLength=INT? ".." maxLength=INT?)?;
+
+Num:
+	name="number" ("in" min=INT? ".." max=INT?)?;
+
+Bool:
+	name="boolean";
+
+Date:
+	name="date" ("in" "the" (past?="past" | future?="future"))?;
+
+Request:
+	method=Method (list?="list" "of")? (entity=[Entity])? ("on" | "to") url=Url (pageable?="pageable" (paging=Paging)?)?
+	(principal?="with" "principal")? "|" name=ValidID "|";
+
+ExceptionResponse:
+	exception=[Excep] "(" code=INT ")";
+
+Excep:
+	name=ValidID "->" code=INT;
+
+enum Method:
+	GET | POST;
+
+Url hidden():
+	{Url}
+	"/" (segments+=UrlSegment ("/" segments+=UrlSegment)*)? ("?" parameters+=RequestParameter ("&"
+	parameters+=RequestParameter)*)?;
+
+UrlSegment:
+	name=ValidID | variable?="{" name=ValidID (":" constraint=PathConstraint)? "}";
+
+enum PathConstraint:
+	STRING | NUMBER="number" | DATE="date" | TIME="time" | DATETIME="datetime";
+
+RequestParameter:
+	name=ValidID (":" type=ParameterType)? (required?="!")?;
+
+enum ParameterType:
+	STRING | NUMBER="number" | DATE="date" | BOOLEAN="boolean";
+
+Paging:
+	{Paging}
+	"(" ("page" ":" page=ValidID)? ("size" ":" size=ValidID)? ")";
+
+Form:
+	"form" name=ValidID "to" request=[Request] "{" fields+=Field ("," fields+=Field)* ("," "submit:"
+	submit=STRING)? "}";
+
+FieldRef:
+	attribute=[Attribute] ("." child=FieldRef)?;
+
+Field:
+	ref=FieldRef ("labeled:" label=STRING)? & ("labeled" "false:" falseLabel=STRING)? & (("placeholder:"
+	placeholder=STRING) | ("default:" default=STRING))?
+	& ("error" "message:" error=STRING)? & ("type:" type=FieldType);
+
+enum FieldType:
+	TEXT="text" | AREA="textarea" | NUMBER="number" | RANGE="range" | CHECKBOX="checkbox" | RADIO="radio" | DATE="date";
+	

@@ -1,0 +1,3 @@
+include 'hu.bzolt.webdsl'
+include 'hu.bzolt.webdsl.ide'
+include 'hu.bzolt.webdsl.tests'
