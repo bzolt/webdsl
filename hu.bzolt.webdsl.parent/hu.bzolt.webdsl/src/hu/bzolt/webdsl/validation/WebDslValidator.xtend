@@ -4,35 +4,27 @@
 package hu.bzolt.webdsl.validation
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.entity.EntityValidator
 import hu.bzolt.webdsl.jvmmodel.InferrerHelper
-import hu.bzolt.webdsl.webDsl.Attribute
-import hu.bzolt.webdsl.webDsl.Bool
-import hu.bzolt.webdsl.webDsl.Date
-import hu.bzolt.webdsl.webDsl.DomainModel
-import hu.bzolt.webdsl.webDsl.Entity
-import hu.bzolt.webdsl.webDsl.EntityRef
-import hu.bzolt.webdsl.webDsl.Excep
-import hu.bzolt.webdsl.webDsl.ExcepGroup
-import hu.bzolt.webdsl.webDsl.Field
-import hu.bzolt.webdsl.webDsl.FieldRef
-import hu.bzolt.webdsl.webDsl.FieldType
-import hu.bzolt.webdsl.webDsl.Form
-import hu.bzolt.webdsl.webDsl.Method
-import hu.bzolt.webdsl.webDsl.Num
 import hu.bzolt.webdsl.webDsl.Paging
-import hu.bzolt.webdsl.webDsl.Request
-import hu.bzolt.webdsl.webDsl.RequestGroup
-import hu.bzolt.webdsl.webDsl.Text
 import hu.bzolt.webdsl.webDsl.Url
 import hu.bzolt.webdsl.webDsl.WebDslPackage
-import java.util.ArrayList
 import org.eclipse.xtext.validation.Check
+import org.eclipse.xtext.validation.ComposedChecks
+import hu.bzolt.webdsl.field.FieldValidator
+import hu.bzolt.webdsl.form.FormValidator
+import hu.bzolt.webdsl.request.RequestValidator
+import hu.bzolt.webdsl.requestgroup.RequestGroupValidator
+import hu.bzolt.webdsl.excep.ExcepValidator
+import hu.bzolt.webdsl.excepgroup.ExcepGroupValidator
 
 /**
  * This class contains custom validation rules. 
  * 
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
+@ComposedChecks(validators=#[EntityValidator, ExcepValidator, ExcepGroupValidator, FieldValidator,
+	FormValidator, RequestValidator, RequestGroupValidator])
 class WebDslValidator extends AbstractWebDslValidator
 {
 	@Inject
@@ -57,52 +49,50 @@ class WebDslValidator extends AbstractWebDslValidator
 	public static val PAGE_AND_SIZE_SAME = "pageAndSizeSame"
 	public static val PAGE_OR_SIZE_TAKEN = "pageOrSizeTaken"
 
-	@Check
-	def checkEntityStartsWithCapital(Entity e)
-	{
-		if (!Character.isUpperCase(e.name.charAt(0)))
-		{
-			warning("The name of an entity should start with a capital",
-				WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, e.name)
-		}
-	}
-
-	@Check
-	def checkInfiniteFlatLoop(EntityRef er)
-	{
-		if (er.flat)
-		{
-			var entities = new ArrayList<String>
-			entities.add((er.eContainer.eContainer as Entity).name)
-			entities.add(er.entity.name)
-			if (infiniteFlatLoop(er.entity, entities))
-			{
-				error("Infinite flattening loop", WebDslPackage.Literals.ENTITY_REF__FLAT,
-					INFINITE_FLAT_LOOP)
-			}
-		}
-	}
-
-	@Check
-	def checkListNotFlattened(EntityRef er)
-	{
-		if (er.flat && (er.eContainer as Attribute).list)
-		{
-			error("List cannot be flattened", WebDslPackage.Literals.ENTITY_REF__FLAT,
-				FLATTENED_LIST)
-		}
-	}
-
-	@Check
-	def checkExcepStartsWithCapital(Excep e)
-	{
-		if (!Character.isUpperCase(e.name.charAt(0)))
-		{
-			warning("The name of an exception should start with a capital",
-				WebDslPackage.Literals.EXCEP__NAME, INVALID_NAME, e.name)
-		}
-	}
-
+//	@Check
+//	def checkEntityStartsWithCapital(Entity e)
+//	{
+//		if (!Character.isUpperCase(e.name.charAt(0)))
+//		{
+//			
+//			warning("The name of an entity should start with a capital",
+//				WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, e.name)
+//		}
+//	}
+//	@Check
+//	def checkInfiniteFlatLoop(EntityRef er)
+//	{
+//		if (er.flat)
+//		{
+//			var entities = new ArrayList<String>
+//			entities.add((er.eContainer.eContainer as Entity).name)
+//			entities.add(er.entity.name)
+//			if (infiniteFlatLoop(er.entity, entities))
+//			{
+//				error("Infinite flattening loop", WebDslPackage.Literals.ENTITY_REF__FLAT,
+//					INFINITE_FLAT_LOOP)
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkListNotFlattened(EntityRef er)
+//	{
+//		if (er.flat && (er.eContainer as Attribute).list)
+//		{
+//			error("List cannot be flattened", WebDslPackage.Literals.ENTITY_REF__FLAT,
+//				FLATTENED_LIST)
+//		}
+//	}
+//	@Check
+//	def checkExcepStartsWithCapital(Excep e)
+//	{
+//		if (!Character.isUpperCase(e.name.charAt(0)))
+//		{
+//			warning("The name of an exception should start with a capital",
+//				WebDslPackage.Literals.EXCEP__NAME, INVALID_NAME, e.name)
+//		}
+//	}
 //		@Check
 //		def checkValidStatusCode(Excep e)
 //		{
@@ -116,249 +106,245 @@ class WebDslValidator extends AbstractWebDslValidator
 //					INVALID_STATUS_CODE, e.code.toString)
 //			}
 //		}
-	@Check
-	def checkExcepGroupStartsWithCapital(ExcepGroup eg)
-	{
-		if (!Character.isUpperCase(eg.name.charAt(0)))
-		{
-			warning("The name of a request group should start with a capital",
-				WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, eg.name)
-		}
+//	@Check
+//	def checkExcepGroupStartsWithCapital(ExcepGroup eg)
+//	{
+//		if (!Character.isUpperCase(eg.name.charAt(0)))
+//		{
+//			warning("The name of a request group should start with a capital",
+//				WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, eg.name)
+//		}
+//	}
+//	@Check
+//	def checkInvalidFalseLabel(Field f)
+//	{
+//		if (f.falseLabel !== null && f.type != FieldType.RADIO)
+//		{
+//			error("The false label can be declared only on radio type field", f,
+//				WebDslPackage.Literals.FIELD__FALSE_LABEL, INVALID_FALSE_LABEL)
+//		}
+//	}
+//
+//	@Check
+//	def checkInvalidFieldType(Field f)
+//	{
+//		var type = f.ref.finalAttribute.type
+//		switch (type)
+//		{
+//			Text:
+//			{
+//				if (!(f.type == FieldType.TEXT || f.type == FieldType.AREA))
+//				{
+//					error("The type is invalid for text attribute", f,
+//						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
+//				}
+//			}
+//			Num:
+//			{
+//				if (!(f.type == FieldType.NUMBER || f.type == FieldType.RANGE))
+//				{
+//					error("The type is invalid for number attribute", f,
+//						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
+//				}
+//			}
+//			Bool:
+//			{
+//				if (!(f.type == FieldType.CHECKBOX || f.type == FieldType.RADIO))
+//				{
+//					error("The type is invalid for bool attribute", f,
+//						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
+//				}
+//			}
+//			Date:
+//			{
+//				if (f.type != FieldType.DATE)
+//				{
+//					error("The type is invalid for date attribute", f,
+//						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
+//				}
+//			}
+//			EntityRef:
+//			{
+//				error("Only simple attribute can be declared as form field", f,
+//					WebDslPackage.Literals.FIELD__REF, INVALID_FIELD_REFERENCE)
+//			}
+//		}
+//	}
+//
+//	@Check
+//	def checkFieldRef(FieldRef fr)
+//	{
+//		if (fr.child !== null && !(fr.attribute.type instanceof EntityRef))
+//		{
+//			error("The attribute '" + fr.attribute.name + "' is a simple attribute", fr,
+//				WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, REFERENCE_ON_SIMPLE_ATTRIBUTE)
+//		}
+//	}
+//	@Check
+//	def checkFormAttribute(Form f)
+//	{
+//		for (field : f.fields)
+//		{
+//			var entity = f.request.entity
+//			var ref = field.ref
+//			if ((ref.attribute.eContainer as Entity) != entity)
+//			{
+//				error("The attribute is not part of the entity associated with the request", ref,
+//					WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, WRONG_FORM_ATTRIBUTE)
+//			}
+//			while (ref.child !== null)
+//			{
+//				entity = (ref.attribute.type as EntityRef).entity
+//				ref = ref.child
+//				if ((ref.attribute.eContainer as Entity) != entity)
+//				{
+//					error("The attribute is not part of the entity '" + entity.name + "'", ref,
+//						WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, WRONG_FORM_ATTRIBUTE)
+//				}
+//			}
+//
+//		}
+//	}
+//
+//	@Check
+//	def checkFormRequestMethod(Form f)
+//	{
+//		if (f.request.method != Method.POST)
+//		{
+//			error("Forms can only be declared for POST requests", f,
+//				WebDslPackage.Literals.FORM__REQUEST, FORM_FOR_GET_REQUEST)
+//		}
+//	}
+//	@Check
+//	def checkPageAndSizeUnique(Paging p)
+//	{
+//		if ((p.page ?: "page").equals(p.size ?: "size"))
+//		{
+//			error("Page and size variable can not be the same", p,
+//				WebDslPackage.Literals.PAGING__PAGE, PAGE_AND_SIZE_SAME, p.page)
+//		}
+//	}
+
+//	@Check
+//	def checkDuplicateUrl(Request r)
+//	{
+//		if (r.countUrl > 1)
+//		{
+//			error("Duplicate URL for method " + r.method, r, WebDslPackage.Literals.REQUEST__URL,
+//				DUPLICATE_URL)
+//		}
+//	}
+//
+//	def private countUrl(Request r)
+//	{
+//		var count = 0
+//		val method = r.method
+//		val url = r.url.urlName
+//		val dModel = r.eContainer.eContainer as DomainModel
+//		count = dModel.eAllContents.filter(Request).filter [ r2 |
+//			r2.method == method && r2.url.urlName == url
+//		].size
+//		return count;
+//	}
+//
+//	@Check
+//	def checkListOnGetRequest(Request r)
+//	{
+//		if (r.list && r.method == Method.POST)
+//		{
+//			error("The modifier 'list of' is only supported on GET request", r,
+//				WebDslPackage.Literals.REQUEST__LIST, INVALID_METHOD_WITH_LIST)
+//		}
+//	}
+//
+//	@Check
+//	def checkNoPageableConflict(Request r)
+//	{
+//		if (r.pageable)
+//		{
+//			var parameters = r.url.parameters.map[p|p.name]
+//			if (r.paging !== null)
+//			{
+//				if (parameters.contains(r.paging.page ?: "page"))
+//				{
+//					error("The name " + (r.paging.page ?: "page") + " is already taken", r.paging,
+//						WebDslPackage.Literals.PAGING__PAGE, PAGE_OR_SIZE_TAKEN,
+//						r.paging.page ?: "page")
+//					}
+//					if (parameters.contains(r.paging.size ?: "size"))
+//					{
+//						error("The name " + (r.paging.size ?: "size") + " is already taken",
+//							r.paging, WebDslPackage.Literals.PAGING__SIZE, PAGE_OR_SIZE_TAKEN,
+//							r.paging.page ?: "page")
+//					}
+//				}
+//			}
+//		}
+//
+//		@Check
+//		def checkPageableOnlyOnList(Request r)
+//		{
+//			if (r.pageable && !r.list)
+//			{
+//				error("Pageable request must return list", r,
+//					WebDslPackage.Literals.REQUEST__PAGEABLE, PAGEABLE_NOT_LIST)
+//			}
+//		}
+//
+//		@Check
+//		def checkRequestParamOnGetRequest(Request r)
+//		{
+//			if (r.method == Method.POST && !r.url.parameters.empty)
+//			{
+//				error("Request parameters only supported on GET request", r,
+//					WebDslPackage.Literals.REQUEST__METHOD, INVALID_METHOD_WITH_REQUEST_PARAMETER)
+//			}
+//		}
+//		@Check
+//		def checkRequestGroupStartsWithCapital(RequestGroup rg)
+//		{
+//			if (!Character.isUpperCase(rg.name.charAt(0)))
+//			{
+//				warning("The name of a request group should start with a capital",
+//					WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, rg.name)
+//			}
+//		}
+//	@Check
+//	def checkDuplicatePathVariable(Url u)
+//	{
+//		var pathVariables = u.pathVariables
+//		for (var i = 0; i < pathVariables.size - 1; i++)
+//		{
+//			for (var j = i + 1; j < pathVariables.size; j++)
+//			{
+//				val segment = pathVariables.get(i)
+//				if (segment.name.equals(pathVariables.get(j).name))
+//				{
+//					error("Duplicate path variable name " + segment.name, segment,
+//						WebDslPackage.Literals.URL_SEGMENT__NAME, DUPLICATE_PATH_VARIABLE,
+//						segment.name)
+//					}
+//				}
+//			}
+//		}
+//
+//		@Check
+//		def checkDuplicateRequestParameter(Url u)
+//		{
+//			var requestparameters = u.parameters
+//			for (var i = 0; i < requestparameters.size - 1; i++)
+//			{
+//				for (var j = i + 1; j < requestparameters.size; j++)
+//				{
+//					val parameter = requestparameters.get(i)
+//					if (parameter.name.equals(requestparameters.get(j).name))
+//					{
+//						error("Duplicate request parameter name " + parameter.name, parameter,
+//							WebDslPackage.Literals.REQUEST_PARAMETER__NAME,
+//							DUPLICATE_REQUEST_PARAMETER, parameter.name)
+//					}
+//				}
+//			}
+//		}
 	}
-
-	@Check
-	def checkInvalidFalseLabel(Field f)
-	{
-		if (f.falseLabel !== null && f.type != FieldType.RADIO)
-		{
-			error("The false label can be declared only on radio type field", f,
-				WebDslPackage.Literals.FIELD__FALSE_LABEL, INVALID_FALSE_LABEL)
-		}
-	}
-
-	@Check
-	def checkInvalidFieldType(Field f)
-	{
-		var type = f.ref.finalAttribute.type
-		switch (type)
-		{
-			Text:
-			{
-				if (!(f.type == FieldType.TEXT || f.type == FieldType.AREA))
-				{
-					error("The type is invalid for text attribute", f,
-						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
-				}
-			}
-			Num:
-			{
-				if (!(f.type == FieldType.NUMBER || f.type == FieldType.RANGE))
-				{
-					error("The type is invalid for number attribute", f,
-						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
-				}
-			}
-			Bool:
-			{
-				if (!(f.type == FieldType.CHECKBOX || f.type == FieldType.RADIO))
-				{
-					error("The type is invalid for bool attribute", f,
-						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
-				}
-			}
-			Date:
-			{
-				if (f.type != FieldType.DATE)
-				{
-					error("The type is invalid for date attribute", f,
-						WebDslPackage.Literals.FIELD__TYPE, INVALID_FIELD_TYPE)
-				}
-			}
-			EntityRef:
-			{
-				error("Only simple attribute can be declared as form field", f,
-					WebDslPackage.Literals.FIELD__REF, INVALID_FIELD_REFERENCE)
-			}
-		}
-	}
-
-	@Check
-	def checkFieldRef(FieldRef fr)
-	{
-		if (fr.child !== null && !(fr.attribute.type instanceof EntityRef))
-		{
-			error("The attribute '" + fr.attribute.name + "' is a simple attribute", fr,
-				WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, REFERENCE_ON_SIMPLE_ATTRIBUTE)
-		}
-	}
-
-	@Check
-	def checkFormAttribute(Form f)
-	{
-		for (field : f.fields)
-		{
-			var entity = f.request.entity
-			var ref = field.ref
-			if ((ref.attribute.eContainer as Entity) != entity)
-			{
-				error("The attribute is not part of the entity associated with the request", ref,
-					WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, WRONG_FORM_ATTRIBUTE)
-			}
-			while (ref.child !== null)
-			{
-				entity = (ref.attribute.type as EntityRef).entity
-				ref = ref.child
-				if ((ref.attribute.eContainer as Entity) != entity)
-				{
-					error("The attribute is not part of the entity '" + entity.name + "'", ref,
-						WebDslPackage.Literals.FIELD_REF__ATTRIBUTE, WRONG_FORM_ATTRIBUTE)
-				}
-			}
-
-		}
-	}
-
-	@Check
-	def checkFormRequestMethod(Form f)
-	{
-		if (f.request.method != Method.POST)
-		{
-			error("Forms can only be declared for POST requests", f,
-				WebDslPackage.Literals.FORM__REQUEST, FORM_FOR_GET_REQUEST)
-		}
-	}
-
-	@Check
-	def checkPageAndSizeUnique(Paging p)
-	{
-		if ((p.page ?: "page").equals(p.size ?: "size"))
-		{
-			error("Page and size variable can not be the same", p,
-				WebDslPackage.Literals.PAGING__PAGE, PAGE_AND_SIZE_SAME, p.page)
-		}
-	}
-
-	@Check
-	def checkDuplicateUrl(Request r)
-	{
-		if (r.countUrl > 1)
-		{
-			error("Duplicate URL for method " + r.method, r, WebDslPackage.Literals.REQUEST__URL,
-				DUPLICATE_URL)
-		}
-	}
-
-	def private countUrl(Request r)
-	{
-		var count = 0
-		val method = r.method
-		val url = r.url.urlName
-		val dModel = r.eContainer.eContainer as DomainModel
-		count = dModel.eAllContents.filter(Request).filter [ r2 |
-			r2.method == method && r2.url.urlName == url
-		].size
-		return count;
-	}
-
-	@Check
-	def checkListOnGetRequest(Request r)
-	{
-		if (r.list && r.method == Method.POST)
-		{
-			error("The modifier 'list of' is only supported on GET request", r,
-				WebDslPackage.Literals.REQUEST__LIST, INVALID_METHOD_WITH_LIST)
-		}
-	}
-
-	@Check
-	def checkNoPageableConflict(Request r)
-	{
-		if (r.pageable)
-		{
-			var parameters = r.url.parameters.map[p|p.name]
-			if (r.paging !== null)
-			{
-				if (parameters.contains(r.paging.page ?: "page"))
-				{
-					error("The name " + (r.paging.page ?: "page") + " is already taken", r.paging,
-						WebDslPackage.Literals.PAGING__PAGE, PAGE_OR_SIZE_TAKEN,
-						r.paging.page ?: "page")
-					}
-					if (parameters.contains(r.paging.size ?: "size"))
-					{
-						error("The name " + (r.paging.size ?: "size") + " is already taken",
-							r.paging, WebDslPackage.Literals.PAGING__SIZE, PAGE_OR_SIZE_TAKEN,
-							r.paging.page ?: "page")
-					}
-				}
-			}
-		}
-
-		@Check
-		def checkPageableOnlyOnList(Request r)
-		{
-			if (r.pageable && !r.list)
-			{
-				error("Pageable request must return list", r,
-					WebDslPackage.Literals.REQUEST__PAGEABLE, PAGEABLE_NOT_LIST)
-			}
-		}
-
-		@Check
-		def checkRequestParamOnGetRequest(Request r)
-		{
-			if (r.method == Method.POST && !r.url.parameters.empty)
-			{
-				error("Request parameters only supported on GET request", r,
-					WebDslPackage.Literals.REQUEST__METHOD, INVALID_METHOD_WITH_REQUEST_PARAMETER)
-			}
-		}
-
-		@Check
-		def checkRequestGroupStartsWithCapital(RequestGroup rg)
-		{
-			if (!Character.isUpperCase(rg.name.charAt(0)))
-			{
-				warning("The name of a request group should start with a capital",
-					WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, INVALID_NAME, rg.name)
-			}
-		}
-
-		@Check
-		def checkDuplicatePathVariable(Url u)
-		{
-			var pathVariables = u.pathVariables
-			for (var i = 0; i < pathVariables.size - 1; i++)
-			{
-				for (var j = i + 1; j < pathVariables.size; j++)
-				{
-					val segment = pathVariables.get(i)
-					if (segment.name.equals(pathVariables.get(j).name))
-					{
-						error("Duplicate path variable name " + segment.name, segment,
-							WebDslPackage.Literals.URL_SEGMENT__NAME, DUPLICATE_PATH_VARIABLE,
-							segment.name)
-					}
-				}
-			}
-		}
-
-		@Check
-		def checkDuplicateRequestParameter(Url u)
-		{
-			var requestparameters = u.parameters
-			for (var i = 0; i < requestparameters.size - 1; i++)
-			{
-				for (var j = i + 1; j < requestparameters.size; j++)
-				{
-					val parameter = requestparameters.get(i)
-					if (parameter.name.equals(requestparameters.get(j).name))
-					{
-						error("Duplicate request parameter name " + parameter.name, parameter,
-							WebDslPackage.Literals.REQUEST_PARAMETER__NAME,
-							DUPLICATE_REQUEST_PARAMETER, parameter.name)
-					}
-				}
-			}
-		}
-	}	
+	
