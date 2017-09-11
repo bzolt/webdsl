@@ -5,7 +5,6 @@ import hu.bzolt.webdsl.excep.ExcepInferrer
 import hu.bzolt.webdsl.jvmmodel.AnnotationRefHelper
 import hu.bzolt.webdsl.jvmmodel.InferrerHelper
 import hu.bzolt.webdsl.webDsl.ExcepGroup
-import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmAnnotationReferenceBuilder
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypeReferenceBuilder
