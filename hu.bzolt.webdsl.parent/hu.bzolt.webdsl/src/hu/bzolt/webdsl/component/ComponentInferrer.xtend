@@ -1,24 +1,25 @@
-package hu.bzolt.webdsl.requestgroup
+package hu.bzolt.webdsl.component
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.entity.EntityInferrer
+import hu.bzolt.webdsl.excep.ExcepInferrer
 import hu.bzolt.webdsl.jvmmodel.AnnotationRefHelper
 import hu.bzolt.webdsl.jvmmodel.InferrerHelper
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.Method
 import hu.bzolt.webdsl.webDsl.Request
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import hu.bzolt.webdsl.webDsl.RequestParameter
 import hu.bzolt.webdsl.webDsl.UrlSegment
 import java.util.ArrayList
 import java.util.Date
 import java.util.List
 import org.eclipse.xtext.common.types.JvmFormalParameter
-import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmAnnotationReferenceBuilder
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypeReferenceBuilder
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
 
-class RequestGroupInferrer
+class ComponentInferrer
 {
 	extension JvmAnnotationReferenceBuilder _annotationTypesBuilder;
 	extension JvmTypeReferenceBuilder _typeReferenceBuilder;
@@ -31,6 +32,79 @@ class RequestGroupInferrer
 
 	@Inject
 	extension InferrerHelper
+
+	@Inject
+	EntityInferrer entityInferrer
+
+	@Inject
+	ExcepInferrer excepInferrer
+
+	def inferExceps(Component c, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase,
+		JvmAnnotationReferenceBuilder annotationTypesBuilder,
+		JvmTypeReferenceBuilder typeReferenceBuilder)
+	{
+		this._annotationTypesBuilder = annotationTypesBuilder;
+		this._typeReferenceBuilder = typeReferenceBuilder;
+
+		c.inferEntities(acceptor, isPreIndexingPhase)
+		
+		c.inferExceps(acceptor, isPreIndexingPhase)
+		c.acceptExceptionHandler(acceptor)
+
+		if (!isPreIndexingPhase)
+		{
+			val service = c.toService
+			acceptor.accept(service)
+
+			val controller = c.toController
+			acceptor.accept(controller)
+		}
+	}
+
+	protected def acceptExceptionHandler(Component c, IJvmDeclaredTypeAcceptor acceptor)
+	{
+		if (c.exceps.length > 0) {
+			acceptor.accept(c.toClass(
+				c.handlerName,
+				[
+					annotations += annotationRef(ControllerAdvice)
+	
+					val responseEntity = typeRef(ResponseEntity, typeRef(Void))
+					for (e : c.exceps)
+					{
+						members += e.toMethod(e.methodName, responseEntity) [
+							annotations += annotationRef(ResponseBody)
+							annotations +=
+								annotationRef(ExceptionHandler).classValue(typeRef(e.className))
+							body = '''return new «responseEntity»(«HttpStatus».valueOf(«e.code»));	'''
+						]
+					}
+				]
+			))
+		}
+	}
+
+	private def inferEntities(Component c, IJvmDeclaredTypeAcceptor acceptor,
+		boolean isPreIndexingPhase)
+	{
+		for (e : c.entities)
+		{
+			entityInferrer.infer(e, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
+				_typeReferenceBuilder)
+		}
+
+	}
+	
+	private def inferExceps(Component c, IJvmDeclaredTypeAcceptor acceptor,
+		boolean isPreIndexingPhase)
+	{
+		for (e : c.exceps)
+		{
+			excepInferrer.infer(e, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
+				_typeReferenceBuilder)
+		}
+
+	}
 
 	def returnType(Request r)
 	{
@@ -143,10 +217,10 @@ class RequestGroupInferrer
 		return parameters
 	}
 
-	def toService(RequestGroup rg)
+	def toService(Component c)
 	{
-		return rg.toInterface(rg.serviceName, [
-			for (r : rg.requests)
+		return c.toInterface(c.serviceName, [
+			for (r : c.requests)
 			{
 				members += r.toMethod(r.methodName, r.returnType ?: inferredType) [
 					abstract = true
@@ -227,16 +301,16 @@ class RequestGroupInferrer
 		return parameters
 	}
 
-	def toController(RequestGroup rg)
+	def toController(Component c)
 	{
-		return rg.toClass(rg.controllerName, [
+		return c.toClass(c.controllerName, [
 			annotations += annotationRef(RestController)
 
-			members += rg.toField(rg.name.toFirstLower + "Service", typeRef(rg.serviceName), [
+			members += c.toField(c.name.toFirstLower + "Service", typeRef(c.serviceName), [
 				annotations += annotationRef(Autowired)
 			])
 
-			for (r : rg.requests)
+			for (r : c.requests)
 			{
 				val isGet = r.method == Method.GET
 				val isPost = r.method == Method.POST
@@ -265,29 +339,12 @@ class RequestGroupInferrer
 						«ELSEIF r.pageable»
 							«typeRef(Pageable)» pageable = new «typeRef(PageRequest)»(page, size);
 						«ENDIF»
-						«IF isGet»return new «responseEntity»(«rg.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF r.pageable»«IF !requestVariables.empty», «ENDIF»pageable«ENDIF»), «HttpStatus».OK);«ENDIF»
-						«IF isPost»«rg.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables»«v.name», «ENDFOR»«r.entity.name.toFirstLower»);
+						«IF isGet»return new «responseEntity»(«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF r.pageable»«IF !requestVariables.empty», «ENDIF»pageable«ENDIF»), «HttpStatus».OK);«ENDIF»
+						«IF isPost»«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables»«v.name», «ENDFOR»«r.entity.name.toFirstLower»);
 						return new «responseEntity»(«HttpStatus».OK);«ENDIF»
 					'''
 				]
 			}
 		])
 	}
-
-	def infer(RequestGroup rg, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase,
-		JvmAnnotationReferenceBuilder annotationTypesBuilder,
-		JvmTypeReferenceBuilder typeReferenceBuilder)
-		{
-			this._annotationTypesBuilder = annotationTypesBuilder;
-			this._typeReferenceBuilder = typeReferenceBuilder;
-			if (!isPreIndexingPhase)
-			{
-				val service = rg.toService
-				acceptor.accept(service)
-
-				val controller = rg.toController
-				acceptor.accept(controller)
-			}
-		}
-	}
-	
+}

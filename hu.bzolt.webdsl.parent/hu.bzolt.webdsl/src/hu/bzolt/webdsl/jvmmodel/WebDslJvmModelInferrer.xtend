@@ -4,12 +4,10 @@
 package hu.bzolt.webdsl.jvmmodel
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.component.ComponentInferrer
 import hu.bzolt.webdsl.entity.EntityInferrer
-import hu.bzolt.webdsl.excepgroup.ExcepGroupInferrer
-import hu.bzolt.webdsl.requestgroup.RequestGroupInferrer
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.Entity
-import hu.bzolt.webdsl.webDsl.ExcepGroup
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import org.eclipse.xtext.common.types.JvmDeclaredType
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
@@ -46,32 +44,12 @@ class WebDslJvmModelInferrer extends AbstractModelInferrer
 	 *            <code>true</code>.
 	 */
 	@Inject
-	EntityInferrer entityInferrer
+	ComponentInferrer componentInferrer
 
-	@Inject
-	ExcepGroupInferrer excepGroupInferrer
-
-	@Inject
-	RequestGroupInferrer requestGroupInferrer
-
-	def dispatch void infer(Entity e, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase)
-	{
-		entityInferrer.infer(e, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
-			_typeReferenceBuilder)
-	}
-
-	def dispatch void infer(ExcepGroup eg, IJvmDeclaredTypeAcceptor acceptor,
+	def dispatch void infer(Component c, IJvmDeclaredTypeAcceptor acceptor,
 		boolean isPreIndexingPhase)
 	{
-		excepGroupInferrer.infer(eg, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
+		componentInferrer.inferExceps(c, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
 			_typeReferenceBuilder)
 	}
-
-	def dispatch void infer(RequestGroup rg, IJvmDeclaredTypeAcceptor acceptor,
-		boolean isPreIndexingPhase)
-	{
-		requestGroupInferrer.infer(rg, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
-			_typeReferenceBuilder)
-	}
-
 }

@@ -6,13 +6,16 @@ DomainModel:
 	elements+=AbstractElement*;
 
 AbstractElement:
-	Entity | RequestGroup | Form | ExcepGroup;
+	Component | Form;
+	
+Component:
+	"component" name=ValidID "{" (entities+=Entity | exceps+=Excep | requests+=Request)+ "}";
 
-RequestGroup:
-	"requests" name=ValidID "{" requests+=Request ("," requests+=Request)* "}";
-
-ExcepGroup:
-	"exceptions" name=ValidID "{" exceps+=Excep ("," exceps+=Excep)* "}";
+//RequestGroup:
+//	"requests" name=ValidID "{" requests+=Request ("," requests+=Request)* "}";
+//
+//ExcepGroup:
+//	"exceptions" name=ValidID "{" exceps+=Excep ("," exceps+=Excep)* "}";
 
 Entity:
 	"entity" name=ValidID "{" attributes+=Attribute ("," attributes+=Attribute)* "}";

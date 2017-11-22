@@ -1,15 +1,14 @@
 package hu.bzolt.webdsl.jvmmodel
 
 import hu.bzolt.webdsl.webDsl.Attribute
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.Entity
 import hu.bzolt.webdsl.webDsl.EntityRef
 import hu.bzolt.webdsl.webDsl.Excep
-import hu.bzolt.webdsl.webDsl.ExcepGroup
 import hu.bzolt.webdsl.webDsl.FieldRef
 import hu.bzolt.webdsl.webDsl.Form
 import hu.bzolt.webdsl.webDsl.PathConstraint
 import hu.bzolt.webdsl.webDsl.Request
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import hu.bzolt.webdsl.webDsl.Url
 import hu.bzolt.webdsl.webDsl.UrlSegment
 import java.util.List
@@ -59,27 +58,27 @@ class InferrerHelper
 
 	def className(Entity e)
 	{
-		return e.eResource.URI.basePackage + ".data." + e.name
+		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name + "." + e.name
 	}
 
 	def className(Excep e)
 	{
-		return e.eResource.URI.basePackage + ".exception." + e.name + "Exception"
+		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name + "." + e.name + "Exception"
 	}
 
-	def serviceName(RequestGroup rg)
+	def serviceName(Component c)
 	{
-		return rg.eResource.URI.basePackage + ".service." + rg.name + "Service"
+		return c.eResource.URI.basePackage + "." + c.name + "." + c.name + "Service"
 	}
 
-	def controllerName(RequestGroup rg)
+	def controllerName(Component c)
 	{
-		return rg.eResource.URI.basePackage + ".controller." + rg.name + "Controller"
+		return c.eResource.URI.basePackage + "." + c.name + "." + c.name + "Controller"
 	}
 
-	def handlerName(ExcepGroup eg)
+	def handlerName(Component c)
 	{
-		return eg.eResource.URI.basePackage + ".controller." + eg.name +
+		return c.eResource.URI.basePackage + "." + c.name + "." + c.name +
 			"ExceptionHandlingController"
 	}
 
@@ -93,9 +92,9 @@ class InferrerHelper
 		return webResourcesPath + "/views/" + f.name.toLowerCase + "form.html"
 	}
 
-	def serviceFile(RequestGroup rg)
+	def serviceFile(Component c)
 	{
-		return webResourcesPath + "/js/services/" + rg.name.toLowerCase + "service.js"
+		return webResourcesPath + "/js/services/" + c.name.toLowerCase + "service.js"
 	}
 
 	def toCamelCase(Url u)

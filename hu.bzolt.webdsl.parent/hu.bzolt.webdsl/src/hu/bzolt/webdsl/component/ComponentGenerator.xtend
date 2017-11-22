@@ -1,12 +1,12 @@
-package hu.bzolt.webdsl.requestgroup
+package hu.bzolt.webdsl.component
 
 import com.google.inject.Inject
 import hu.bzolt.webdsl.jvmmodel.InferrerHelper
 import hu.bzolt.webdsl.request.RequestGenerator
-import hu.bzolt.webdsl.webDsl.RequestGroup
+import hu.bzolt.webdsl.webDsl.Component
 import org.eclipse.xtext.generator.IFileSystemAccess
 
-class RequestGroupGenerator
+class ComponentGenerator
 {
 	@Inject
 	extension InferrerHelper
@@ -14,16 +14,16 @@ class RequestGroupGenerator
 	@Inject
 	extension RequestGenerator
 
-	def generate(RequestGroup rg, IFileSystemAccess fsa)
+	def generate(Component c, IFileSystemAccess fsa)
 	{
-		fsa.generateFile(rg.serviceFile, rg.compile);
+		fsa.generateFile(c.serviceFile, c.compile);
 	}
 
-	def compile(RequestGroup rg)
+	def compile(Component c)
 	'''
-		app.service("«rg.name»Service", ["$http", 
+		app.service("«c.name»Service", ["$http", 
 			function($http) {
-				«FOR r : rg.requests»
+				«FOR r : c.requests»
 					
 					«r.compile»
 				«ENDFOR»		

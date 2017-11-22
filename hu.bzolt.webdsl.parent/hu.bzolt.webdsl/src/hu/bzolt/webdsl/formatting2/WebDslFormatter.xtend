@@ -4,17 +4,14 @@
 package hu.bzolt.webdsl.formatting2
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.component.ComponentFormatter
 import hu.bzolt.webdsl.entity.EntityFormatter
-import hu.bzolt.webdsl.excepgroup.ExcepGroupFormatter
 import hu.bzolt.webdsl.form.FormFormatter
-import hu.bzolt.webdsl.requestgroup.RequestGroupFormatter
 import hu.bzolt.webdsl.services.WebDslGrammarAccess
 import hu.bzolt.webdsl.webDsl.AbstractElement
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.DomainModel
-import hu.bzolt.webdsl.webDsl.Entity
-import hu.bzolt.webdsl.webDsl.ExcepGroup
 import hu.bzolt.webdsl.webDsl.Form
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.xbase.formatting2.XbaseFormatter
@@ -25,13 +22,11 @@ class WebDslFormatter extends XbaseFormatter
 	extension WebDslGrammarAccess
 
 	@Inject
+	ComponentFormatter componentFormatter
+	@Inject
 	EntityFormatter entityFormatter
 	@Inject
-	ExcepGroupFormatter excepGroupFormatter
-	@Inject
 	FormFormatter formFormatter
-	@Inject
-	RequestGroupFormatter requestGroupFormatter
 
 	def dispatch void format(DomainModel d, extension IFormattableDocument document)
 	{
@@ -42,41 +37,33 @@ class WebDslFormatter extends XbaseFormatter
 		}
 	}
 
-	def dispatch void format(Entity e, extension IFormattableDocument document)
+	def dispatch void format(Component c, extension IFormattableDocument document)
 	{
-		entityFormatter.format(e, document)
+		componentFormatter.format(c, document)
 	}
 
-	def dispatch void format(RequestGroup rg, extension IFormattableDocument document)
-	{
-		requestGroupFormatter.format(rg, document)
-	}
-
+//	def dispatch void format(Entity e, extension IFormattableDocument document)
+//	{
+//		entityFormatter.format(e, document)
+//	}
 	def dispatch void format(Form f, extension IFormattableDocument document)
 	{
 		formFormatter.format(f, document)
 	}
 
-	def dispatch void format(ExcepGroup eg, extension IFormattableDocument document)
-	{
-		excepGroupFormatter.format(eg, document)
-	}
-
 	override protected initialize(FormatterRequest request)
 	{
 		super.initialize(request)
+		componentFormatter.init(request)
 		entityFormatter.init(request)
-		excepGroupFormatter.init(request)
 		formFormatter.init(request)
-		requestGroupFormatter.init(request)
 	}
 
 	override protected reset()
 	{
 		super.reset()
+		componentFormatter.res
 		entityFormatter.res
-		excepGroupFormatter.res
 		formFormatter.res
-		requestGroupFormatter.res
 	}
 }

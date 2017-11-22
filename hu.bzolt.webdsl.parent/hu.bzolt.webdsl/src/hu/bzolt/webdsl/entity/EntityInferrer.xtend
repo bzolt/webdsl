@@ -125,7 +125,7 @@ class EntityInferrer // extends AbstractModelInferrer
 			Num: typeRef(int)
 			Bool: typeRef(boolean)
 			Date: typeRef(java.util.Date)
-			EntityRef: typeRef((a.type as EntityRef).entity.name)
+			EntityRef: typeRef((a.type as EntityRef).entity.className)
 		}
 	}
 

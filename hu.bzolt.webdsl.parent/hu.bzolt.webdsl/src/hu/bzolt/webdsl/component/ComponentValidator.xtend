@@ -1,27 +1,26 @@
-package hu.bzolt.webdsl.requestgroup
+package hu.bzolt.webdsl.component
 
 import hu.bzolt.webdsl.validation.WebDslValidator
-import hu.bzolt.webdsl.webDsl.RequestGroup
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.WebDslPackage
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator
 import org.eclipse.xtext.validation.Check
 import org.eclipse.xtext.validation.EValidatorRegistrar
 
-class RequestGroupValidator extends AbstractDeclarativeValidator
+class ComponentValidator extends AbstractDeclarativeValidator
 {
 	override register(EValidatorRegistrar registrar)
 	{
 	}
 
 	@Check
-	def checkRequestGroupStartsWithCapital(RequestGroup rg)
+	def checkComponentStartsWithCapital(Component c)
 	{
-		if (!Character.isUpperCase(rg.name.charAt(0)))
+		if (!Character.isUpperCase(c.name.charAt(0)))
 		{
-			warning("The name of a request group should start with a capital",
+			warning("The name of a component should start with a capital",
 				WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME, WebDslValidator.INVALID_NAME,
-				rg.name)
+				c.name)
 		}
 	}
 }
-	

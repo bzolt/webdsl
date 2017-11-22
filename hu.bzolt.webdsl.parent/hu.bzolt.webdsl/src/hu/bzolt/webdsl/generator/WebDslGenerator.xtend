@@ -4,10 +4,10 @@
 package hu.bzolt.webdsl.generator
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.component.ComponentGenerator
 import hu.bzolt.webdsl.form.FormGenerator
-import hu.bzolt.webdsl.requestgroup.RequestGroupGenerator
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.Form
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.IGenerator
@@ -20,16 +20,16 @@ import org.eclipse.xtext.generator.IGenerator
 class WebDslGenerator implements IGenerator
 {
 	@Inject
-	extension RequestGroupGenerator
+	extension ComponentGenerator
 
 	@Inject
 	extension FormGenerator
 
 	override doGenerate(Resource resource, IFileSystemAccess fsa)
 	{
-		for (rg : resource.allContents.toIterable.filter(RequestGroup))
+		for (c : resource.allContents.toIterable.filter(Component))
 		{
-			rg.generate(fsa)
+			c.generate(fsa)
 		}
 		for (f : resource.allContents.toIterable.filter(Form))
 		{

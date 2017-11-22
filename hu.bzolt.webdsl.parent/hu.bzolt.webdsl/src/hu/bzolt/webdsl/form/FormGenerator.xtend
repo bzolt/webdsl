@@ -3,9 +3,9 @@ package hu.bzolt.webdsl.form
 import com.google.inject.Inject
 import hu.bzolt.webdsl.field.FieldGenerator
 import hu.bzolt.webdsl.jvmmodel.InferrerHelper
+import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.Form
 import hu.bzolt.webdsl.webDsl.Num
-import hu.bzolt.webdsl.webDsl.RequestGroup
 import org.eclipse.xtext.generator.IFileSystemAccess
 
 class FormGenerator
@@ -23,26 +23,29 @@ class FormGenerator
 	}
 
 	def compileController(Form f)
-	'''
-		app.controller("«f.name»Controller", [ "$scope", "«(f.request.eContainer as RequestGroup).name»Service", 
-			function($scope, «(f.request.eContainer as RequestGroup).name»Service) {
-				$scope.«f.request.entity.name.toFirstLower» = {};
-				«FOR field : f.fields»
-					«IF field.^default !== null»
-						$scope.«f.request.entity.name.toFirstLower».«field.ref.fullName» = «if (field.ref.finalAttribute.type != Num)  '"'»«field.^default»«if (field.ref.finalAttribute.type != Num)  '"'»;
-					«ENDIF»
-				«ENDFOR»
-				
-				$scope.submit = function() {
-					«(f.request.eContainer as RequestGroup).name»Service.«f.request.url.toCamelCase»«f.request.method.toString.toLowerCase.toFirstUpper»($scope.«f.request.entity.name.toFirstLower»).then(function(response) {
-						«f.name»Service.succes(response);
-					}, function(response)
-					{
-						«f.name»Service.error(response);
-					});
-				};
-			} ]);
-	'''
+	{
+		val componentName = (f.request.eContainer as Component).name
+		return '''
+			app.controller("«f.name»Controller", [ "$scope", "«componentName»Service", 
+				function($scope, «componentName»Service) {
+					$scope.«f.request.entity.name.toFirstLower» = {};
+					«FOR field : f.fields»
+						«IF field.^default !== null»
+							$scope.«f.request.entity.name.toFirstLower».«field.ref.fullName» = «if (field.ref.finalAttribute.type != Num)  '"'»«field.^default»«if (field.ref.finalAttribute.type != Num)  '"'»;
+						«ENDIF»
+					«ENDFOR»
+					
+					$scope.submit = function() {
+						«componentName»Service.«f.request.url.toCamelCase»«f.request.method.toString.toLowerCase.toFirstUpper»($scope.«f.request.entity.name.toFirstLower»).then(function(response) {
+							«f.name»Service.succes(response);
+						}, function(response)
+						{
+							«f.name»Service.error(response);
+						});
+					};
+				} ]);
+		'''
+	}
 
 	def compileHtml(Form f)
 	'''

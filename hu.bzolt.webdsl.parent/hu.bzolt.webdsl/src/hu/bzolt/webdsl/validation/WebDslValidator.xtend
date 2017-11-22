@@ -4,27 +4,22 @@
 package hu.bzolt.webdsl.validation
 
 import com.google.inject.Inject
+import hu.bzolt.webdsl.component.ComponentValidator
 import hu.bzolt.webdsl.entity.EntityValidator
-import hu.bzolt.webdsl.jvmmodel.InferrerHelper
-import hu.bzolt.webdsl.webDsl.Paging
-import hu.bzolt.webdsl.webDsl.Url
-import hu.bzolt.webdsl.webDsl.WebDslPackage
-import org.eclipse.xtext.validation.Check
-import org.eclipse.xtext.validation.ComposedChecks
+import hu.bzolt.webdsl.excep.ExcepValidator
 import hu.bzolt.webdsl.field.FieldValidator
 import hu.bzolt.webdsl.form.FormValidator
+import hu.bzolt.webdsl.jvmmodel.InferrerHelper
 import hu.bzolt.webdsl.request.RequestValidator
-import hu.bzolt.webdsl.requestgroup.RequestGroupValidator
-import hu.bzolt.webdsl.excep.ExcepValidator
-import hu.bzolt.webdsl.excepgroup.ExcepGroupValidator
+import org.eclipse.xtext.validation.ComposedChecks
 
 /**
  * This class contains custom validation rules. 
  * 
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
-@ComposedChecks(validators=#[EntityValidator, ExcepValidator, ExcepGroupValidator, FieldValidator,
-	FormValidator, RequestValidator, RequestGroupValidator])
+@ComposedChecks(validators=#[EntityValidator, ComponentValidator, ExcepValidator, FieldValidator,
+	FormValidator, RequestValidator])
 class WebDslValidator extends AbstractWebDslValidator
 {
 	@Inject
@@ -224,7 +219,6 @@ class WebDslValidator extends AbstractWebDslValidator
 //				WebDslPackage.Literals.PAGING__PAGE, PAGE_AND_SIZE_SAME, p.page)
 //		}
 //	}
-
 //	@Check
 //	def checkDuplicateUrl(Request r)
 //	{
@@ -346,5 +340,4 @@ class WebDslValidator extends AbstractWebDslValidator
 //				}
 //			}
 //		}
-	}
-	
+}
