@@ -191,11 +191,13 @@ class EntityInferrer // extends AbstractModelInferrer
 		{
 			this._annotationTypesBuilder = annotationTypesBuilder;
 			this._typeReferenceBuilder = typeReferenceBuilder;
-			val entityClass = e.toClass(e.className)
-			acceptor.accept(entityClass) [
-				members += e.toConstructor[]
-				members += e.processAttributes("")
-			]
+			if (!isPreIndexingPhase) {
+				val entityClass = e.toClass(e.className)
+				acceptor.accept(entityClass) [
+					members += e.toConstructor[]
+					members += e.processAttributes("")
+				]
+			}
 		}
 	}
 	

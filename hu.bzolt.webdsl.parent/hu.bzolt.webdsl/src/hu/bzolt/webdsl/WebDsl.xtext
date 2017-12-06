@@ -7,9 +7,9 @@ DomainModel:
 
 AbstractElement:
 	Component | Form;
-	
+
 Component:
-	"component" name=ValidID "{" (entities+=Entity | exceps+=Excep | requests+=Request)+ "}";
+	"component" name=ValidID "{" (entities+=Entity)* (exceps+=Excep)* (requests+=Request)* "}";
 
 Entity:
 	"entity" name=ValidID "{" attributes+=Attribute ("," attributes+=Attribute)* "}";
@@ -67,7 +67,8 @@ Paging:
 	"(" ("page" ":" page=ValidID)? ("size" ":" size=ValidID)? ")";
 
 Form:
-	segments+=HtmlBody "form" name=ValidID "to" request=[Request] (segments+=HtmlBody segments+=Field)* segments+=HtmlBody;
+	segments+=HtmlBody "form" name=ValidID "to" request=[Request] (segments+=HtmlBody segments+=Field)*
+	segments+=HtmlBody;
 
 FormSegment:
 	HtmlBody | Field;
@@ -76,10 +77,10 @@ HtmlBody:
 	text=TEMPLATE;
 
 terminal TEMPLATE:
-	("<" | "~") (ESCAPED_CHAR | !("`"|"~"))* ("~" | EOF);
+	("<" | "~") (ESCAPED_CHAR | !("`" | "~"))* ("~" | EOF);
 
 terminal fragment ESCAPED_CHAR:
-    "`" ("`"|"~");
+	"`" ("`" | "~");
 
 Field:
 	ref=FieldRef;

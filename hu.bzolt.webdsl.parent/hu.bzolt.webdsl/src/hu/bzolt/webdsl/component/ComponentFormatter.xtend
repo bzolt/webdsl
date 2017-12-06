@@ -1,18 +1,16 @@
 package hu.bzolt.webdsl.component
 
-import com.google.inject.Inject
-import hu.bzolt.webdsl.entity.EntityFormatter
+import com.google.common.base.Strings
 import hu.bzolt.webdsl.webDsl.Component
+import hu.bzolt.webdsl.webDsl.Excep
 import hu.bzolt.webdsl.webDsl.WebDslPackage
+import java.util.ArrayList
 import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.xbase.formatting2.XbaseFormatter
 
 class ComponentFormatter extends XbaseFormatter
 {
-	@Inject
-	EntityFormatter entityFormatter
-	
 	def dispatch void format(Component c, extension IFormattableDocument document)
 	{
 		c.regionFor.keyword("Component").prepend[noSpace]
@@ -22,27 +20,58 @@ class ComponentFormatter extends XbaseFormatter
 			c.regionFor.keyword("}").prepend[newLine],
 			[indent]
 		)
-		c.entities.forEach[e |
+		c.entities.forEach [ e |
 			e.prepend[newLine]
-			entityFormatter.format(e, document)
+			e.format
+			e.append[newLines = 2]
 		]
-		c.exceps.forEach[e |
-			e.prepend[newLine]
-		]
-		c.requests.forEach[r |
-			r.prepend[newLine]
+
+		c.formatExceps(document)
+
+		c.requests.forEach [ r | r.format]
+		c.requests.reverseView.tail.forEach [ r |
+			r.append[setNewLines(1, 1, 2)]
 		]
 	}
-	
+
+	def formatExceps(Component c, extension IFormattableDocument document)
+	{
+		c.exceps.reverseView.tail.forEach [ e |
+			e.append[setNewLines(1, 1, 2)]
+		]
+		var exceps = c.exceps.drop(0)
+		while (!exceps.empty)
+		{
+			val group = new ArrayList<Excep>
+			group += exceps.head
+			var i = 1
+			while (i < exceps.size && exceps.get(i).previousHiddenRegion.lineCount <= 2)
+			{
+				group += exceps.get(i)
+				i++
+			}
+
+			val width = group.map[regionFor.feature(WebDslPackage.Literals.EXCEP__NAME).length].
+				max + 1;
+			for (e : group)
+			{
+				val region = e.regionFor.feature(WebDslPackage.Literals.EXCEP__NAME)
+				region.append[space = Strings.repeat(" ", width - region.length)]
+				e.regionFor.keyword("->").append[oneSpace]
+			}
+
+			exceps = exceps.drop(i)
+		}
+		c.exceps.last.append[newLines = 2]
+	}
+
 	def init(FormatterRequest request)
 	{
 		initialize(request)
-		entityFormatter.init(request)
 	}
 
 	def res()
 	{
 		reset
-		entityFormatter.res
 	}
 }

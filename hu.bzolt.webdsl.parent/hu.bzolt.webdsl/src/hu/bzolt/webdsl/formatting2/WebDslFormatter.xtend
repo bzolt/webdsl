@@ -5,12 +5,16 @@ package hu.bzolt.webdsl.formatting2
 
 import com.google.inject.Inject
 import hu.bzolt.webdsl.component.ComponentFormatter
+import hu.bzolt.webdsl.entity.EntityFormatter
 import hu.bzolt.webdsl.form.FormFormatter
+import hu.bzolt.webdsl.request.RequestFormatter
 import hu.bzolt.webdsl.services.WebDslGrammarAccess
 import hu.bzolt.webdsl.webDsl.AbstractElement
 import hu.bzolt.webdsl.webDsl.Component
 import hu.bzolt.webdsl.webDsl.DomainModel
+import hu.bzolt.webdsl.webDsl.Entity
 import hu.bzolt.webdsl.webDsl.Form
+import hu.bzolt.webdsl.webDsl.Request
 import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.xbase.formatting2.XbaseFormatter
@@ -22,7 +26,13 @@ class WebDslFormatter extends XbaseFormatter
 
 	@Inject
 	ComponentFormatter componentFormatter
-	
+
+	@Inject
+	EntityFormatter entityFormatter
+
+	@Inject
+	RequestFormatter requestFormatter
+
 	@Inject
 	FormFormatter formFormatter
 
@@ -40,10 +50,16 @@ class WebDslFormatter extends XbaseFormatter
 		componentFormatter.format(c, document)
 	}
 
-//	def dispatch void format(Entity e, extension IFormattableDocument document)
-//	{
-//		entityFormatter.format(e, document)
-//	}
+	def dispatch void format(Entity e, extension IFormattableDocument document)
+	{
+		entityFormatter.format(e, document)
+	}
+
+	def dispatch void format(Request r, extension IFormattableDocument document)
+	{
+		requestFormatter.format(r, document)
+	}
+
 	def dispatch void format(Form f, extension IFormattableDocument document)
 	{
 		formFormatter.format(f, document)
@@ -53,6 +69,8 @@ class WebDslFormatter extends XbaseFormatter
 	{
 		super.initialize(request)
 		componentFormatter.init(request)
+		entityFormatter.init(request)
+		requestFormatter.init(request)
 		formFormatter.init(request)
 	}
 
@@ -60,6 +78,8 @@ class WebDslFormatter extends XbaseFormatter
 	{
 		super.reset()
 		componentFormatter.res
+		entityFormatter.res
+		requestFormatter.res
 		formFormatter.res
 	}
 }
