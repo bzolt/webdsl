@@ -184,7 +184,7 @@ class ComponentInferrer
 				null
 			}
 			case NUMBER,
-			case String:
+			case STRING:
 			{
 				null
 			}

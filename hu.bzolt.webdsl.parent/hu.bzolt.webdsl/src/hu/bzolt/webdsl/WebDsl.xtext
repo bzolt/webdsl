@@ -3,19 +3,13 @@ grammar hu.bzolt.webdsl.WebDsl with org.eclipse.xtext.xbase.Xbase
 generate webDsl "http://www.bzolt.hu/webdsl/WebDsl"
 
 DomainModel:
-	elements+=AbstractElement*;
+	elements+=AbstractElement;
 
 AbstractElement:
 	Component | Form;
 	
 Component:
 	"component" name=ValidID "{" (entities+=Entity | exceps+=Excep | requests+=Request)+ "}";
-
-//RequestGroup:
-//	"requests" name=ValidID "{" requests+=Request ("," requests+=Request)* "}";
-//
-//ExcepGroup:
-//	"exceptions" name=ValidID "{" exceps+=Excep ("," exceps+=Excep)* "}";
 
 Entity:
 	"entity" name=ValidID "{" attributes+=Attribute ("," attributes+=Attribute)* "}";
@@ -45,9 +39,6 @@ Request:
 	method=Method (list?="list" "of")? (entity=[Entity])? ("on" | "to") url=Url (pageable?="pageable" (paging=Paging)?)?
 	(principal?="with" "principal")? "|" name=ValidID "|";
 
-ExceptionResponse:
-	exception=[Excep] "(" code=INT ")";
-
 Excep:
 	name=ValidID "->" code=INT;
 
@@ -76,17 +67,22 @@ Paging:
 	"(" ("page" ":" page=ValidID)? ("size" ":" size=ValidID)? ")";
 
 Form:
-	"form" name=ValidID "to" request=[Request] "{" fields+=Field ("," fields+=Field)* ("," "submit:"
-	submit=STRING)? "}";
+	segments+=HtmlBody "form" name=ValidID "to" request=[Request] (segments+=HtmlBody segments+=Field)* segments+=HtmlBody;
+
+FormSegment:
+	HtmlBody | Field;
+
+HtmlBody:
+	text=TEMPLATE;
+
+terminal TEMPLATE:
+	("<" | "~") (ESCAPED_CHAR | !("`"|"~"))* ("~" | EOF);
+
+terminal fragment ESCAPED_CHAR:
+    "`" ("`"|"~");
+
+Field:
+	ref=FieldRef;
 
 FieldRef:
 	attribute=[Attribute] ("." child=FieldRef)?;
-
-Field:
-	ref=FieldRef ("labeled:" label=STRING)? & ("labeled" "false:" falseLabel=STRING)? & (("placeholder:"
-	placeholder=STRING) | ("default:" default=STRING))?
-	& ("error" "message:" error=STRING)? & ("type:" type=FieldType);
-
-enum FieldType:
-	TEXT="text" | AREA="textarea" | NUMBER="number" | RANGE="range" | CHECKBOX="checkbox" | RADIO="radio" | DATE="date";
-	

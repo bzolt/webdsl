@@ -13,17 +13,17 @@ class FormFormatter extends XbaseFormatter
 {
 	def dispatch void format(Form f, extension IFormattableDocument document)
 	{
-		f.regionFor.keyword("requests").prepend[noSpace]
-		f.regionFor.feature(WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME).prepend[oneSpace]
-		interior(
-			f.regionFor.keyword("{").surround[newLine],
-			f.regionFor.keyword("}").prepend[newLine],
-			[indent]
-		)
-		f.regionFor.keywords(",").forEach [
-			prepend[noSpace]
-			append[newLine]
-		]
+//		f.regionFor.keyword("requests").prepend[noSpace]
+//		f.regionFor.feature(WebDslPackage.Literals.ABSTRACT_ELEMENT__NAME).prepend[oneSpace]
+//		interior(
+//			f.regionFor.keyword("{").surround[newLine],
+//			f.regionFor.keyword("}").prepend[newLine],
+//			[indent]
+//		)
+//		f.regionFor.keywords(",").forEach [
+//			prepend[noSpace]
+//			append[newLine]
+//		]
 	}
 
 	def init(FormatterRequest request)

@@ -5,7 +5,6 @@ package hu.bzolt.webdsl.formatting2
 
 import com.google.inject.Inject
 import hu.bzolt.webdsl.component.ComponentFormatter
-import hu.bzolt.webdsl.entity.EntityFormatter
 import hu.bzolt.webdsl.form.FormFormatter
 import hu.bzolt.webdsl.services.WebDslGrammarAccess
 import hu.bzolt.webdsl.webDsl.AbstractElement
@@ -23,8 +22,7 @@ class WebDslFormatter extends XbaseFormatter
 
 	@Inject
 	ComponentFormatter componentFormatter
-	@Inject
-	EntityFormatter entityFormatter
+	
 	@Inject
 	FormFormatter formFormatter
 
@@ -55,7 +53,6 @@ class WebDslFormatter extends XbaseFormatter
 	{
 		super.initialize(request)
 		componentFormatter.init(request)
-		entityFormatter.init(request)
 		formFormatter.init(request)
 	}
 
@@ -63,7 +60,6 @@ class WebDslFormatter extends XbaseFormatter
 	{
 		super.reset()
 		componentFormatter.res
-		entityFormatter.res
 		formFormatter.res
 	}
 }

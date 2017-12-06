@@ -1,8 +1,6 @@
 package hu.bzolt.webdsl.form
 
 import hu.bzolt.webdsl.validation.WebDslValidator
-import hu.bzolt.webdsl.webDsl.Entity
-import hu.bzolt.webdsl.webDsl.EntityRef
 import hu.bzolt.webdsl.webDsl.Form
 import hu.bzolt.webdsl.webDsl.Method
 import hu.bzolt.webdsl.webDsl.WebDslPackage
@@ -16,32 +14,34 @@ class FormValidator extends AbstractDeclarativeValidator
 	{
 	}
 
-	@Check
-	def checkFormAttribute(Form f)
-	{
-		for (field : f.fields)
-		{
-			var entity = f.request.entity
-			var ref = field.ref
-			if ((ref.attribute.eContainer as Entity) != entity)
-			{
-				error("The attribute is not part of the entity associated with the request", ref,
-					WebDslPackage.Literals.FIELD_REF__ATTRIBUTE,
-					WebDslValidator.WRONG_FORM_ATTRIBUTE)
-			}
-			while (ref.child !== null)
-			{
-				entity = (ref.attribute.type as EntityRef).entity
-				ref = ref.child
-				if ((ref.attribute.eContainer as Entity) != entity)
-				{
-					error("The attribute is not part of the entity '" + entity.name + "'", ref,
-						WebDslPackage.Literals.FIELD_REF__ATTRIBUTE,
-						WebDslValidator.WRONG_FORM_ATTRIBUTE)
-				}
-			}
-		}
-	}
+//	@Check
+//	def checkFormAttribute(Form f)
+//	{
+//		for (field : f.fields)
+//		{
+//			var entity = f.request.entity
+//			var ref = field.ref
+//			if ((ref.attribute.eContainer as Entity) != entity)
+//			{
+//				println(entity)
+//				println(ref.attribute.eContainer as Entity)
+//				error("The attribute is not part of the entity associated with the request", ref,
+//					WebDslPackage.Literals.FIELD_REF__ATTRIBUTE,
+//					WebDslValidator.WRONG_FORM_ATTRIBUTE)
+//			}
+//			while (ref.child !== null)
+//			{
+//				entity = (ref.attribute.type as EntityRef).entity
+//				ref = ref.child
+//				if ((ref.attribute.eContainer as Entity) != entity)
+//				{
+//					error("The attribute is not part of the entity '" + entity.name + "'", ref,
+//						WebDslPackage.Literals.FIELD_REF__ATTRIBUTE,
+//						WebDslValidator.WRONG_FORM_ATTRIBUTE)
+//				}
+//			}
+//		}
+//	}
 
 	@Check
 	def checkFormRequestMethod(Form f)

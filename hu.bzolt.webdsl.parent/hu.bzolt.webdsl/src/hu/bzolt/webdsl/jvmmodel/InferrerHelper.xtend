@@ -82,11 +82,6 @@ class InferrerHelper
 			"ExceptionHandlingController"
 	}
 
-	def controllerFile(Form f)
-	{
-		return webResourcesPath + "/js/controllers/" + f.name.toLowerCase + "controller.js"
-	}
-
 	def htmlFile(Form f)
 	{
 		return webResourcesPath + "/views/" + f.name.toLowerCase + "form.html"
