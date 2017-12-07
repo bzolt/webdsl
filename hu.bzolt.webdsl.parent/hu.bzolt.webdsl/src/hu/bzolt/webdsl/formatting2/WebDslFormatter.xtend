@@ -38,7 +38,6 @@ class WebDslFormatter extends XbaseFormatter
 
 	def dispatch void format(DomainModel d, extension IFormattableDocument document)
 	{
-		d.elements.reverseView.tail.forEach[e|e.append[setNewLines(2, 2, 2)]]
 		for (AbstractElement element : d.elements)
 		{
 			element.format;
