@@ -108,7 +108,7 @@ class ComponentInferrer
 
 	def returnType(Request r)
 	{
-		return if (r.method == Method.GET)
+		return if (r.method == Method.GET && r.entity !== null)
 			if (r.list)
 				typeRef(List, typeRef(r.entity.className))
 			else
@@ -142,7 +142,7 @@ class ComponentInferrer
 
 	def responseEntityType(Request r)
 	{
-		return if (r.method == Method.GET)
+		return if (r.method == Method.GET && r.entity !== null)
 			if (r.list)
 				typeRef(List, typeRef(r.entity.className))
 			else
@@ -206,7 +206,7 @@ class ComponentInferrer
 		{
 			parameters += p.toParameter(p.name, p.paramType)
 		}
-		if (r.method == Method.POST)
+		if (r.method == Method.POST && r.entity !== null)
 		{
 			parameters += r.toParameter(r.entity.name.toFirstLower, typeRef(r.entity.className))
 		}
@@ -314,6 +314,7 @@ class ComponentInferrer
 			{
 				val isGet = r.method == Method.GET
 				val isPost = r.method == Method.POST
+				val hasEntity = r.entity !== null
 				val responseEntity = typeRef(ResponseEntity, r.responseEntityType ?: inferredType)
 				members += r.toMethod(r.methodName, responseEntity) [
 					annotations += annotationRef(r.method.toMapping, r.url.urlName)
@@ -321,7 +322,7 @@ class ComponentInferrer
 					val requestVariables = r.toRequestVariables
 					parameters += requestVariables
 
-					if (isPost)
+					if (isPost && hasEntity)
 					{
 						parameters += r.postParameters
 					}
@@ -331,7 +332,7 @@ class ComponentInferrer
 					}
 
 					body = '''
-						«IF isPost»
+						«IF isPost && hasEntity»
 							if (bindingResult.hasErrors())
 							{
 								return new «responseEntity»(«HttpStatus».BAD_REQUEST);
@@ -340,7 +341,7 @@ class ComponentInferrer
 							«typeRef(Pageable)» pageable = new «typeRef(PageRequest)»(page, size);
 						«ENDIF»
 						«IF isGet»return new «responseEntity»(«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF r.pageable»«IF !requestVariables.empty», «ENDIF»pageable«ENDIF»), «HttpStatus».OK);«ENDIF»
-						«IF isPost»«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables»«v.name», «ENDFOR»«r.entity.name.toFirstLower»);
+						«IF isPost»«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF hasEntity»«r.entity.name.toFirstLower»«ENDIF»);
 						return new «responseEntity»(«HttpStatus».OK);«ENDIF»
 					'''
 				]
