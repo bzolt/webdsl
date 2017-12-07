@@ -16,8 +16,8 @@ class RequestGenerator
 	{
 		val params = r.functionParameters
 		return '''			
-			this.«r.url.toCamelCase»«r.method.toString.toLowerCase.toFirstUpper» = function(«params.join(", ")»«IF r.method == Method.POST»«if (!params.empty) ", "»«r.entity.name.toLowerCase»«ENDIF») {
-				«IF (!r.url.parameters.empty)»
+			this.«r.method.toString.toLowerCase»«r.url.toCamelCase» = function(«params.join(", ")»«IF r.method == Method.POST»«if (!params.empty) ", "»«r.entity.name.toLowerCase»«ENDIF») {
+				«IF (!r.url.parameters.empty || r.pageable)»
 					config = {};
 					config.params = {};
 					«FOR p: r.url.parameters»

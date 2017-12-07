@@ -49,7 +49,7 @@ class WebDslJvmModelInferrer extends AbstractModelInferrer
 	def dispatch void infer(Component c, IJvmDeclaredTypeAcceptor acceptor,
 		boolean isPreIndexingPhase)
 	{
-		componentInferrer.inferExceps(c, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
+		componentInferrer.inferComponent(c, acceptor, isPreIndexingPhase, _annotationTypesBuilder,
 			_typeReferenceBuilder)
 	}
 }

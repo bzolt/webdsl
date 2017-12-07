@@ -39,7 +39,7 @@ class ComponentInferrer
 	@Inject
 	ExcepInferrer excepInferrer
 
-	def inferExceps(Component c, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase,
+	def inferComponent(Component c, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase,
 		JvmAnnotationReferenceBuilder annotationTypesBuilder,
 		JvmTypeReferenceBuilder typeReferenceBuilder)
 	{

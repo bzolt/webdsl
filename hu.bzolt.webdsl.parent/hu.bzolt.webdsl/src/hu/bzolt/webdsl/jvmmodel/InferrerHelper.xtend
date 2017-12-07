@@ -58,27 +58,27 @@ class InferrerHelper
 
 	def className(Entity e)
 	{
-		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name + "." + e.name
+		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name.toLowerCase + "." + e.name
 	}
 
 	def className(Excep e)
 	{
-		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name + "." + e.name + "Exception"
+		return e.eResource.URI.basePackage + "." + (e.eContainer as Component).name.toLowerCase + "." + e.name + "Exception"
 	}
 
 	def serviceName(Component c)
 	{
-		return c.eResource.URI.basePackage + "." + c.name + "." + c.name + "Service"
+		return c.eResource.URI.basePackage + "." + c.name.toLowerCase + "." + c.name + "Service"
 	}
 
 	def controllerName(Component c)
 	{
-		return c.eResource.URI.basePackage + "." + c.name + "." + c.name + "Controller"
+		return c.eResource.URI.basePackage + "." + c.name.toLowerCase + "." + c.name + "Controller"
 	}
 
 	def handlerName(Component c)
 	{
-		return c.eResource.URI.basePackage + "." + c.name + "." + c.name +
+		return c.eResource.URI.basePackage + "." + c.name.toLowerCase + "." + c.name +
 			"ExceptionHandlingController"
 	}
 

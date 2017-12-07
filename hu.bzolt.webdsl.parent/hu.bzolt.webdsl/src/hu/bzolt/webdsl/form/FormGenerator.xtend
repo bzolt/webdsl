@@ -31,6 +31,6 @@ class FormGenerator
 	}
 	
 	def dispatch compileSegment(Field f) {
-		return f.compile((f.eContainer as Form ).request.entity.name.toFirstLower)
+		return f.compile((f.eContainer as Form).request.entity.name.toFirstLower)
 	} 
 }
