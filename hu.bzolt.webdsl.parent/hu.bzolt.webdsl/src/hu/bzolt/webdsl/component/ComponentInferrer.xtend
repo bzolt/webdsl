@@ -276,16 +276,8 @@ class ComponentInferrer
 		val pageDefault = new Pair<String, String>("defaultValue", "0")
 		var Pair<String, String> pageValue
 		var Pair<String, String> sizeValue
-		if (r.paging !== null)
-		{
-			pageValue = new Pair<String, String>("value", r.paging.page ?: "page")
-			sizeValue = new Pair<String, String>("value", r.paging.size ?: "size")
-		}
-		else
-		{
-			pageValue = new Pair<String, String>("value", "page")
-			sizeValue = new Pair<String, String>("value", "size")
-		}
+		pageValue = new Pair<String, String>("value", r.paging?.page ?: "page")
+		sizeValue = new Pair<String, String>("value", r.paging?.size ?: "size")
 		val sizeDefault = new Pair<String, String>("defaultValue", "10")
 
 		val page = r.toParameter("page", typeRef(int))
@@ -341,7 +333,7 @@ class ComponentInferrer
 							«typeRef(Pageable)» pageable = new «typeRef(PageRequest)»(page, size);
 						«ENDIF»
 						«IF isGet»return new «responseEntity»(«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF r.pageable»«IF !requestVariables.empty», «ENDIF»pageable«ENDIF»), «HttpStatus».OK);«ENDIF»
-						«IF isPost»«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF hasEntity»«r.entity.name.toFirstLower»«ENDIF»);
+						«IF isPost»«c.name.toFirstLower»Service.«r.methodName»(«FOR v : requestVariables SEPARATOR ", "»«v.name»«ENDFOR»«IF hasEntity»«if (!requestVariables.isEmpty) ", "»«r.entity.name.toFirstLower»«ENDIF»);
 						return new «responseEntity»(«HttpStatus».OK);«ENDIF»
 					'''
 				]

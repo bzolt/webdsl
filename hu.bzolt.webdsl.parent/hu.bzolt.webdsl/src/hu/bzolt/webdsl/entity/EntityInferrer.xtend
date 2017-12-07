@@ -92,7 +92,7 @@ class EntityInferrer // extends AbstractModelInferrer
 		members += a.toSetter(memberName, typeName)
 		if (a.list)
 		{
-			members += a.toMethod("add" + memberName.toFirstUpper, typeRef(void)) [
+			members += a.toMethod("addTo" + memberName.toFirstUpper, typeRef(void)) [
 				parameters += a.toParameter("item", a.typeName)
 				body = '''this.«memberName».add(item);'''
 			]

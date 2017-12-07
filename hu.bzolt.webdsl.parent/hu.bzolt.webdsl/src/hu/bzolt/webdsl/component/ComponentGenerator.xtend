@@ -16,7 +16,8 @@ class ComponentGenerator
 
 	def generate(Component c, IFileSystemAccess fsa)
 	{
-		if (!c.requests.isEmpty) {
+		if (!c.requests.isEmpty)
+		{
 			fsa.generateFile(c.serviceFile, c.compile);
 		}
 	}

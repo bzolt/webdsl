@@ -16,7 +16,7 @@ class RequestGenerator
 	{
 		val params = r.functionParameters
 		return '''			
-			this.«r.method.toString.toLowerCase»«r.url.toCamelCase» = function(«params.join(", ")»«IF r.method == Method.POST»«if (!params.empty) ", "»«r.entity.name.toLowerCase»«ENDIF») {
+			this.«r.method.toString.toLowerCase»«r.url.toCamelCase» = function(«params.join(", ")»«IF r.method == Method.POST»«if (!params.empty) ", "»«if (r.entity !== null) r.entity.name.toLowerCase»«ENDIF») {
 				«IF (!r.url.parameters.empty || r.pageable)»
 					config = {};
 					config.params = {};
@@ -24,11 +24,11 @@ class RequestGenerator
 						config.params.«p.name» = «p.name»;
 					«ENDFOR»
 					«IF r.pageable»
-						config.params.«r.paging.page ?: "page"» = page;
-						config.params.«r.paging.size ?: "size"» = size;
+						config.params.«r.paging?.page ?: "page"» = page;
+						config.params.«r.paging?.size ?: "size"» = size;
 					«ENDIF»
 				«ENDIF»
-				return $http.«r.method.toString.toLowerCase»(«r.url.urlWithVariables», «IF r.method == Method.POST»«r.entity.name.toLowerCase»«ELSE»«if (r.url.parameters.empty) "null" else "config"»«ENDIF»);
+				return $http.«r.method.toString.toLowerCase»(«r.url.urlWithVariables», «IF r.method == Method.POST && (r.entity !== null)»«r.entity.name.toLowerCase»«ELSE»«if (r.url.parameters.empty && !r.pageable) "null" else "config"»«ENDIF»);
 			};
 		'''
 	}
